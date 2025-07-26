@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
 
 export default function Posts() {
   const posts: { id: number; title: string }[] = [
@@ -15,10 +15,45 @@ export default function Posts() {
   ];
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      {posts.map((post) => (
-        <Text key={post.id}>{post.title}</Text>
-      ))}
+    <View style={styles.postsContainer}>
+      <FlatList
+        data={posts}
+        keyExtractor={(post) => post.id.toString()}
+        contentContainerStyle={styles.listWrap}
+        renderItem={({ item }) => (
+          <Text style={styles.postItem}>{item.title}</Text>
+        )}
+      />
     </View>
   );
 }
+
+const WIDTH = Dimensions.get("window").width;
+
+const styles = StyleSheet.create({
+  postsContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
+  listWrap: {
+    width: WIDTH - 16,
+    paddingTop: 70,
+    paddingBottom: 16,
+    paddingHorizontal: 6,
+  },
+  postItem: {
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 10,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    height: 100,
+  },
+});
