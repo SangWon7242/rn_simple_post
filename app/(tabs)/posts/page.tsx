@@ -1,3 +1,4 @@
+import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
 
@@ -6,16 +7,19 @@ export default function Posts() {
     { userId: number; id: number; title: string; body: string }[]
   >([]);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
+  const fetchPosts = async () => {
+    try {
       const response = await fetch(
         "https://jsonplaceholder.typicode.com/posts"
       );
-
       const data = await response.json();
       setPosts(data);
-    };
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  useEffect(() => {
     fetchPosts();
   }, []);
 
@@ -28,7 +32,19 @@ export default function Posts() {
         renderItem={({ item }) => (
           <View style={styles.postItem}>
             <Text style={styles.postId}>{item.id}번 게시글</Text>
-            <Text style={styles.postTitle}>{item.title}</Text>
+            <Link
+              href={{
+                pathname: `/posts/[id]/post`,
+                params: {
+                  userId: item.userId,
+                  id: item.id,
+                  title: item.title,
+                  body: item.body,
+                },
+              }}
+            >
+              <Text style={styles.postTitle}>{item.title}</Text>
+            </Link>
           </View>
         )}
       />
