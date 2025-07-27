@@ -1,11 +1,11 @@
+// type : 타입스크립트에서 타입을 정의할 때 사용
+import type { PostDto } from "@/types/post";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
 
 export default function Posts() {
-  const [posts, setPosts] = useState<
-    { userId: number; id: number; title: string; body: string }[]
-  >([]);
+  const [posts, setPosts] = useState<PostDto[]>([]);
 
   const fetchPosts = async () => {
     try {
