@@ -79,12 +79,28 @@ export default function Post() {
           </View>
           <View style={styles.contentBody}>
             <View style={styles.contentTitleWrap}>
-              <Text style={styles.postTitleContent}>{post?.title}</Text>
+              <Text style={styles.postTitle}>{post?.title}</Text>
             </View>
             <View style={styles.contentBodyWrap}>
               <Text style={styles.postBody}>{post?.content}</Text>
             </View>
           </View>
+        </View>
+      </View>
+      <View style={styles.postReplyContainer}>
+        <View style={styles.postReplyInner}>
+          <View>
+            <Text style={{ fontWeight: "bold" }}>댓글0</Text>
+          </View>
+          <View style={styles.postReplyContent}>
+            <Text>아직 댓글이 없어요.</Text>
+            <Text>가장 먼저 댓글을 남겨보세요.</Text>
+          </View>
+        </View>
+      </View>
+      <View style={styles.postReplyInputContainer}>
+        <View style={styles.postReplyInputInner}>
+          <Text style={{ fontWeight: "bold" }}>댓글 입력창</Text>
         </View>
       </View>
     </View>
@@ -98,18 +114,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     marginTop: 60,
+    gap: 5,
   },
   postInner: {
     width: WIDTH,
     backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    flex: 0.6,
   },
   postHeader: {
     flexDirection: "row",
@@ -127,6 +137,7 @@ const styles = StyleSheet.create({
   },
   postContentContainer: {
     padding: 10,
+    flexGrow: 1,
   },
   contentHeader: {
     flexDirection: "row",
@@ -139,23 +150,47 @@ const styles = StyleSheet.create({
   profileNickname: {
     fontWeight: "bold",
   },
-  postTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
   profileDate: {
     fontSize: 13,
     color: "#666",
   },
-  postTitleContent: {
-    fontSize: 16,
+  postTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
     color: "#333",
+    paddingVertical: 8,
   },
-  postBodyContainer: {
-    marginTop: 5,
+  contentBody: {
+    flexGrow: 1,
+  },
+  contentTitleWrap: {},
+  contentBodyWrap: {
+    flex: 1,
   },
   postBody: {
+    flex: 1,
     fontSize: 16,
-    marginTop: 5,
+  },
+  postReplyContainer: {
+    width: WIDTH,
+    backgroundColor: "#fff",
+    flex: 0.3,
+  },
+  postReplyInner: {
+    padding: 10,
+    flex: 1,
+  },
+  postReplyContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  postReplyInputContainer: {
+    width: WIDTH,
+    backgroundColor: "#fff",
+    flex: 0.1,
+  },
+  postReplyInputInner: {
+    padding: 10,
   },
 });
