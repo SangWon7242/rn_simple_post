@@ -1,11 +1,16 @@
 import { db } from "@/firebase/config";
 import { PostWithContentDto } from "@/types/post";
-import { useLocalSearchParams } from "expo-router";
+import Feather from "@expo/vector-icons/Feather";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import Octicons from "@expo/vector-icons/Octicons";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Post() {
+  const router = useRouter();
+
   // useLocalSearchParams : 동적 라우팅을 위한 파라미터
   // 받아온 파라미터를 문자열로 처리
   const { postId } = useLocalSearchParams();
@@ -38,11 +43,37 @@ export default function Post() {
     <View style={styles.postContainer}>
       <View style={styles.postInner}>
         <View style={styles.postHeader}>
-          <Text style={styles.postTitle}>제목</Text>
-          <Text style={styles.postTitleContent}>{post?.title}</Text>
+          <View style={styles.postHeaderLeft}>
+            <Pressable onPress={() => router.back()}>
+              <Octicons name="chevron-left" size={24} color="black" />
+            </Pressable>
+          </View>
+          <View style={styles.postHeaderRight}>
+            <Pressable onPress={() => console.log("bell")}>
+              <Octicons name="bell" size={24} color="black" />
+            </Pressable>
+            <Pressable onPress={() => console.log("upload")}>
+              <Feather name="upload" size={24} color="black" />
+            </Pressable>
+            <Pressable onPress={() => console.log("dots-vertical")}>
+              <MaterialCommunityIcons
+                name="dots-vertical"
+                size={24}
+                color="black"
+              />
+            </Pressable>
+          </View>
         </View>
-        <View style={styles.postBodyContainer}>
-          <Text style={styles.postBody}>{post?.content}</Text>
+        <View style={styles.postContentContainer}>
+          <View style={styles.contentHeader}></View>
+          <View style={styles.contentBody}>
+            <View style={styles.contentTitleWrap}>
+              <Text style={styles.postTitleContent}>{post?.title}</Text>
+            </View>
+            <View style={styles.contentBodyWrap}>
+              <Text style={styles.postBody}>{post?.content}</Text>
+            </View>
+          </View>
         </View>
       </View>
     </View>
@@ -55,11 +86,10 @@ const styles = StyleSheet.create({
   postContainer: {
     flex: 1,
     alignItems: "center",
+    marginTop: 60,
   },
   postInner: {
-    width: WIDTH - 15,
-    padding: 16,
-    borderRadius: 10,
+    width: WIDTH,
     backgroundColor: "#fff",
     shadowColor: "#000",
     shadowOffset: {
@@ -71,9 +101,18 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   postHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
     paddingVertical: 10,
+    paddingHorizontal: 10,
+  },
+  postHeaderLeft: {},
+  postHeaderRight: {
+    flexDirection: "row",
+    gap: 10,
   },
   postTitle: {
     fontSize: 20,

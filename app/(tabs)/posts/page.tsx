@@ -26,9 +26,9 @@ export default function Posts() {
         return {
           id: doc.id, // Firestore에서 가져온 데이터의 id
           postId: Number(postId),
-          createDate: createDate as Date,
-          title: title as string,
-          content: content as string,
+          createDate: createDate,
+          title: title,
+          content: content,
         };
       });
 
