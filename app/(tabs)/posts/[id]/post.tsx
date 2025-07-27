@@ -1,11 +1,12 @@
 import { db } from "@/firebase/config";
 import { PostWithContentDto } from "@/types/post";
 import Feather from "@expo/vector-icons/Feather";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Post() {
@@ -65,7 +66,17 @@ export default function Post() {
           </View>
         </View>
         <View style={styles.postContentContainer}>
-          <View style={styles.contentHeader}></View>
+          <View style={styles.contentHeader}>
+            <View style={styles.profileImage}>
+              <Pressable onPress={() => console.log("MyPage")}>
+                <FontAwesome6 name="user-circle" size={30} color="black" />
+              </Pressable>
+            </View>
+            <View style={styles.profileInfo}>
+              <Text style={styles.profileNickname}>닉네임</Text>
+              <Text style={styles.profileDate}>2025년 7월 27일</Text>
+            </View>
+          </View>
           <View style={styles.contentBody}>
             <View style={styles.contentTitleWrap}>
               <Text style={styles.postTitleContent}>{post?.title}</Text>
@@ -114,9 +125,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
   },
+  postContentContainer: {
+    padding: 10,
+  },
+  contentHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 5,
+    gap: 10,
+  },
+  profileImage: {},
+  profileInfo: {},
+  profileNickname: {
+    fontWeight: "bold",
+  },
   postTitle: {
     fontSize: 20,
     fontWeight: "bold",
+  },
+  profileDate: {
+    fontSize: 13,
+    color: "#666",
   },
   postTitleContent: {
     fontSize: 16,
