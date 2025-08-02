@@ -160,6 +160,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderTopWidth: 1,
     borderTopColor: "#333",
+    paddingBottom: 25,
   },
   toolbarButton: {
     alignItems: "center",

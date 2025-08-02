@@ -30,6 +30,9 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <Ionicons name="add" color={focused ? "black" : "gray"} size={24} />
           ),
+          tabBarStyle: {
+            display: "none",
+          },
           tabBarLabelStyle: {
             fontSize: 13,
           },
