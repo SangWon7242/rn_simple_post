@@ -2,6 +2,7 @@ import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StatusBar,
@@ -40,29 +41,41 @@ export default function PostWriteForm() {
 
       {/* 구분선 */}
       <View style={styles.divider} />
-
       {/* 제목 입력 */}
-      <TextInput
-        style={styles.titleInput}
-        placeholder="제목을 입력하세요."
-        placeholderTextColor="#999"
-        value={title}
-        onChangeText={setTitle}
-      />
+      <KeyboardAvoidingView
+        style={styles.titleContainer}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        // 64 : 키보드가 올라왔을 때의 여백
+        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+      >
+        <TextInput
+          style={styles.titleInput}
+          placeholder="제목을 입력하세요."
+          placeholderTextColor="#999"
+          value={title}
+          onChangeText={setTitle}
+        />
+      </KeyboardAvoidingView>
 
       {/* 내용 입력 (스크롤뷰 사용) */}
-      <ScrollView style={styles.contentContainer}>
-        <TextInput
-          style={styles.contentInput}
-          placeholder="이야기를 나눠보세요.
+      <KeyboardAvoidingView
+        style={styles.contentContainer}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+      >
+        <ScrollView>
+          <TextInput
+            style={styles.contentInput}
+            placeholder="이야기를 나눠보세요.
 #맛집 #병원 #산책 ..."
-          placeholderTextColor="#999"
-          multiline
-          value={content}
-          onChangeText={setContent}
-          textAlignVertical="top"
-        />
-      </ScrollView>
+            placeholderTextColor="#999"
+            multiline
+            value={content}
+            onChangeText={setContent}
+            textAlignVertical="top"
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       {/* 하단 툴바 */}
       <View style={styles.toolbar}>
@@ -141,6 +154,7 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#333",
   },
+  titleContainer: {},
   titleInput: {
     color: "white",
     fontSize: 18,
