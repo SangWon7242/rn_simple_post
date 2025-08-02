@@ -1,4 +1,5 @@
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Platform,
@@ -12,6 +13,8 @@ import {
 } from "react-native";
 
 export default function PostWriteForm() {
+  const router = useRouter();
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
@@ -21,7 +24,7 @@ export default function PostWriteForm() {
 
       {/* 네비게이션 헤더 */}
       <View style={styles.header}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.navigate("/(tabs)/posts/page")}>
           <Ionicons name="close" size={28} color="white" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.completeButton}>
