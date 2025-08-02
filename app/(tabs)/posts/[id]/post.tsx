@@ -5,7 +5,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -14,23 +14,20 @@ export default function Post() {
 
   // useLocalSearchParams : 동적 라우팅을 위한 파라미터
   // 받아온 파라미터를 문자열로 처리
-  const { postId } = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
 
   const [post, setPost] = useState<PostWithContentDto | null>(null);
 
   const fetchPost = async () => {
     try {
-      const postQuery = query(
-        collection(db, "post"),
-        where("postId", "==", Number(postId))
-      );
+      // firebase는 문서 참조 방식
+      const postRef = doc(db, "post", id as string);
+      const postSnap = await getDoc(postRef);
 
-      // postsSnap : Firestore에서 가져온 데이터
-      const postSnap = await getDocs(postQuery);
-
-      const postData = postSnap.docs[0].data();
-
-      setPost(postData as PostWithContentDto);
+      if (postSnap.exists()) {
+        const post = postSnap.data() as PostWithContentDto;
+        setPost(post);
+      }
     } catch (error) {
       console.log(error);
     }
