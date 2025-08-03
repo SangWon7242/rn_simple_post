@@ -1,7 +1,13 @@
 import { db } from "@/firebase/config";
 import { PostDto } from "@/types/post";
 import { Link } from "expo-router";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  Timestamp,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Dimensions, FlatList, StyleSheet, Text, View } from "react-native";
 
@@ -16,23 +22,22 @@ export default function Posts() {
         orderBy("createDate", "desc")
       );
 
-      // postsSnap : Firestore에서 가져온 데이터
-      const postsSnap = await getDocs(postsQuery);
+      // await onSnapshot : post 컬렉션의 데이터를 실시간으로 가져옴
+      // snapShot : Firestore에서 가져온 데이터
+      await onSnapshot(postsQuery, (snapShot) => {
+        const postsData = snapShot.docs.map((doc) => {
+          const { createDate, title, content } = doc.data();
 
-      // postsSnap.docs.forEach((doc) => console.log(doc.data));
+          return {
+            id: doc.id,
+            createDate: createDate as Timestamp,
+            title: title,
+            content: content,
+          };
+        });
 
-      const postsData = postsSnap.docs.map((doc) => {
-        const { createDate, title, content } = doc.data();
-
-        return {
-          id: doc.id, // Firestore에서 가져온 데이터의 id
-          createDate: createDate,
-          title: title,
-          content: content,
-        };
+        setPosts(postsData);
       });
-
-      setPosts(postsData);
     } catch (error) {
       console.log("오류 발생 : " + error);
       setError("오류 발생");
