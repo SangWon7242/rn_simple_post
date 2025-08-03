@@ -13,7 +13,7 @@ export default function Posts() {
     try {
       const postsQuery = query(
         collection(db, "post"),
-        orderBy("postId", "desc")
+        orderBy("createDate", "desc")
       );
 
       // postsSnap : Firestore에서 가져온 데이터
@@ -22,11 +22,10 @@ export default function Posts() {
       // postsSnap.docs.forEach((doc) => console.log(doc.data));
 
       const postsData = postsSnap.docs.map((doc) => {
-        const { postId, createDate, title, content } = doc.data();
+        const { createDate, title, content } = doc.data();
 
         return {
           id: doc.id, // Firestore에서 가져온 데이터의 id
-          postId: Number(postId),
           createDate: createDate,
           title: title,
           content: content,
@@ -61,13 +60,11 @@ export default function Posts() {
         contentContainerStyle={styles.listWrap}
         renderItem={({ item }) => (
           <View style={styles.postItem}>
-            <Text style={styles.postId}>{item.postId}번 게시글</Text>
             <Link
               href={{
                 pathname: `/posts/[id]/post`, // [id] : 동적 라우팅
                 params: {
                   id: item.id,
-                  postId: item.postId,
                 },
               }}
             >
