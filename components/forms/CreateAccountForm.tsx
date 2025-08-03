@@ -1,6 +1,10 @@
+import { auth } from "@/firebase/config";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import {
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -43,14 +47,75 @@ export default function CreateAccountForm({
     return password === confirmPassword;
   };
 
+  const validateForm = () => {
+    if (!email.trim()) {
+      Alert.alert("이메일을 입력해주세요.");
+      return false;
+    }
+
+    if (!isValidateEmail(email)) {
+      Alert.alert("이메일 형식이 올바르지 않습니다.");
+      return false;
+    }
+
+    if (!password.trim()) {
+      Alert.alert("비밀번호를 입력해주세요.");
+      return false;
+    }
+
+    if (!isValidatePassword(password)) {
+      Alert.alert("비밀번호는 6자 이상이어야 합니다.");
+      return false;
+    }
+
+    if (!confirmPassword.trim()) {
+      Alert.alert("비밀번호 확인을 입력해주세요.");
+      return false;
+    }
+
+    if (!isValidateConfirmPassword(password, confirmPassword)) {
+      Alert.alert("비밀번호가 일치하지 않습니다.");
+      return false;
+    }
+
+    return true;
+  };
+
   // 회원가입 버튼 클릭 시 실행될 함수
-  const handleSignup = () => {
-    console.log("회원가입");
+  const handleSignup = async (email: string, password: string) => {
+    if (!validateForm()) return;
+
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      Alert.alert("회원가입이 완료되었습니다.");
+      router.replace("/"); // 가입후 홈으로 이동
+    } catch (error: any) {
+      let errorMessage = "회원가입 실패";
+
+      switch (error.code) {
+        case "auth/email-already-exists":
+          errorMessage = "이미 존재하는 이메일입니다.";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "이메일 형식이 올바르지 않습니다.";
+          break;
+        case "auth/weak-password":
+          errorMessage = "비밀번호가 너무 약합니다.";
+          break;
+        case "auth/network-request-failed":
+          errorMessage = "네트워크 연결을 확인해주세요.";
+          break;
+      }
+
+      Alert.alert("회원 가입 실패", errorMessage);
+    }
+
+    onSuccess();
   };
 
   // 뒤로가기 버튼 클릭 시 실행될 함수
   const handleBack = () => {
-    console.log("뒤로가기");
+    onBack();
   };
 
   return (
@@ -138,7 +203,7 @@ export default function CreateAccountForm({
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   style={styles.signupButton}
-                  onPress={handleSignup}
+                  onPress={() => handleSignup(email, password)}
                   activeOpacity={0.8}
                 >
                   <Text style={styles.signupButtonText}>회원가입</Text>
