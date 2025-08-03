@@ -102,6 +102,48 @@ export default function PostWriteForm() {
     router.navigate("/(tabs)/posts/page");
   };
 
+  const validateForm = useCallback(() => {
+    if (title.trim().length == 0) {
+      Alert.alert("제목을 입력해주세요.");
+      return false;
+    }
+
+    if (content.trim().length == 0) {
+      Alert.alert("내용을 입력해주세요.");
+      return false;
+    }
+
+    return true;
+  }, [title, content]);
+
+  const onSubmit = () => {
+    if (!validateForm()) return;
+
+    setTitle("");
+    setContent("");
+    console.log("게시물 작성이 완료 되었습니다.");
+  };
+
+  const onTopicSelect = useCallback(() => {
+    console.log("주제 선택");
+  }, []);
+
+  const onImageSelect = useCallback(() => {
+    console.log("이미지 선택");
+  }, []);
+
+  const onLocationSelect = useCallback(() => {
+    console.log("장소 선택");
+  }, []);
+
+  const onVoteSelect = useCallback(() => {
+    console.log("투표 선택");
+  }, []);
+
+  const onTagSelect = useCallback(() => {
+    console.log("태그 선택");
+  }, []);
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -114,13 +156,13 @@ export default function PostWriteForm() {
         <TouchableOpacity onPress={handleClose}>
           <Ionicons name="close" size={28} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.completeButton}>
+        <TouchableOpacity style={styles.completeButton} onPress={onSubmit}>
           <Text style={styles.completeButtonText}>완료</Text>
         </TouchableOpacity>
       </View>
 
       {/* 주제 선택 영역 */}
-      <TouchableOpacity style={styles.topicSelector}>
+      <TouchableOpacity style={styles.topicSelector} onPress={onTopicSelect}>
         <Text style={styles.topicText}>게시글의 주제를 선택해주세요.</Text>
         <Ionicons name="chevron-forward" size={24} color="white" />
       </TouchableOpacity>
@@ -160,19 +202,22 @@ export default function PostWriteForm() {
           },
         ]}
       >
-        <TouchableOpacity style={styles.toolbarButton}>
+        <TouchableOpacity style={styles.toolbarButton} onPress={onImageSelect}>
           <Ionicons name="image-outline" size={24} color="white" />
           <Text style={styles.toolbarText}>사진</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.toolbarButton}>
+        <TouchableOpacity
+          style={styles.toolbarButton}
+          onPress={onLocationSelect}
+        >
           <Ionicons name="location-outline" size={24} color="white" />
           <Text style={styles.toolbarText}>장소</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.toolbarButton}>
+        <TouchableOpacity style={styles.toolbarButton} onPress={onVoteSelect}>
           <MaterialIcons name="how-to-vote" size={24} color="white" />
           <Text style={styles.toolbarText}>투표</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.toolbarButton}>
+        <TouchableOpacity style={styles.toolbarButton} onPress={onTagSelect}>
           <FontAwesome name="hashtag" size={24} color="white" />
           <Text style={styles.toolbarText}>태그</Text>
         </TouchableOpacity>
