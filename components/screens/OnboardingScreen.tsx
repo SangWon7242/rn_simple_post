@@ -1,16 +1,29 @@
+import CreateAccountForm from "@/components/forms/CreateAccountForm";
+import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function OnboardingScreen() {
+  const [showCreateAccount, setShowCreateAccount] = useState(false);
+
   // 시작하기 버튼 클릭 시 실행될 함수
-  const handleStart = () => {
-    console.log("회원가입");
+  const handleCreateAccount = () => {
+    setShowCreateAccount(true);
   };
 
   // 로그인 텍스트 클릭 시 실행될 함수
   const handleLogin = () => {
     console.log("로그인");
   };
+
+  if (showCreateAccount) {
+    return (
+      <CreateAccountForm
+        onBack={() => setShowCreateAccount(false)}
+        onSuccess={() => setShowCreateAccount(false)}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -40,7 +53,7 @@ export default function OnboardingScreen() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.startButton}
-          onPress={handleStart}
+          onPress={handleCreateAccount}
           activeOpacity={0.8}
         >
           <Text style={styles.startButtonText}>시작하기</Text>
