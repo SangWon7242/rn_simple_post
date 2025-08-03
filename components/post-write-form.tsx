@@ -1,7 +1,8 @@
 import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  Animated,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -14,42 +15,54 @@ import {
   View,
 } from "react-native";
 
-const useToolbarHeightHook = (toolbarHeight: number) => {
-  // 키보드가 화면에서 보이는지 여부
+const useKeyboardOffsetHook = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
-  // 키보드의 높이
-  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
+  const keyboardOffset = useRef(new Animated.Value(0)).current;
+
+  // 키보드가 나타났을 때
+  const keyboardDidShowListener = (e: any) => {
+    const { height } = e.endCoordinates;
+    setKeyboardHeight(height);
+    setKeyboardVisible(true);
+
+    Animated.timing(keyboardOffset, {
+      toValue: -height,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // 키보드가 사라졌을 때
+  const keyboardDidHideListener = () => {
+    setKeyboardHeight(0);
+    setKeyboardVisible(false);
+
+    Animated.timing(keyboardOffset, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  };
 
   useEffect(() => {
-    const showKeyboard = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-      (e) => {
-        const targetHeight = e.endCoordinates.height;
-
-        setKeyboardVisible(true);
-        setKeyboardHeight(targetHeight);
-      }
+    const keyboardShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      keyboardDidShowListener
     );
-
-    const hideKeyboard = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-      () => {
-        setKeyboardVisible(false);
-        setKeyboardHeight(0);
-      }
+    const keyboardHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      keyboardDidHideListener
     );
 
     return () => {
-      showKeyboard.remove();
-      hideKeyboard.remove();
+      keyboardShowListener.remove();
+      keyboardHideListener.remove();
     };
-  }, [toolbarHeight]);
+  }, []);
 
-  return {
-    keyboardVisible,
-    keyboardHeight,
-  };
+  return { keyboardHeight, keyboardVisible, keyboardOffset };
 };
 
 export default function PostWriteForm() {
@@ -57,26 +70,14 @@ export default function PostWriteForm() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [toolbarHeight, setToolbarHeight] = useState<number>(0);
 
-  const onToolbarLayout = (e: any) => {
-    const { height } = e.nativeEvent.layout;
-    console.log(height);
-    setToolbarHeight(height);
-  };
-
-  const { keyboardVisible, keyboardHeight } =
-    useToolbarHeightHook(toolbarHeight);
+  const { keyboardHeight, keyboardVisible, keyboardOffset } =
+    useKeyboardOffsetHook();
 
   return (
     <KeyboardAvoidingView
-      style={[
-        styles.container,
-        { marginBottom: keyboardVisible ? keyboardHeight + 5 : 0 },
-      ]}
+      style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      // 64 : 키보드가 올라왔을 때의 여백
-      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
     >
       <View style={styles.statusBar}></View>
 
@@ -98,36 +99,39 @@ export default function PostWriteForm() {
 
       {/* 구분선 */}
       <View style={styles.divider} />
-      {/* 제목 입력 */}
 
-      <View style={styles.titleContainer}>
-        <TextInput
-          style={styles.titleInput}
-          placeholder="제목을 입력하세요."
-          placeholderTextColor="#999"
-          value={title}
-          onChangeText={setTitle}
-        />
-      </View>
+      {/* 제목 입력 */}
+      <TextInput
+        style={styles.titleInput}
+        placeholder="제목을 입력하세요."
+        placeholderTextColor="#999"
+        value={title}
+        onChangeText={setTitle}
+      />
 
       {/* 내용 입력 (스크롤뷰 사용) */}
-      <View style={styles.contentContainer}>
-        <ScrollView>
-          <TextInput
-            style={styles.contentInput}
-            placeholder="이야기를 나눠보세요.
+      <ScrollView style={styles.contentContainer}>
+        <TextInput
+          style={styles.contentInput}
+          placeholder="이야기를 나눠보세요.
 #맛집 #병원 #산책 ..."
-            placeholderTextColor="#999"
-            multiline
-            value={content}
-            onChangeText={setContent}
-            textAlignVertical="top"
-          />
-        </ScrollView>
-      </View>
+          placeholderTextColor="#999"
+          multiline
+          value={content}
+          onChangeText={setContent}
+          textAlignVertical="top"
+        />
+      </ScrollView>
 
       {/* 하단 툴바 */}
-      <View style={styles.toolbar} onLayout={onToolbarLayout}>
+      <Animated.View
+        style={[
+          styles.toolbar,
+          {
+            transform: [{ translateY: keyboardOffset }],
+          },
+        ]}
+      >
         <TouchableOpacity style={styles.toolbarButton}>
           <Ionicons name="image-outline" size={24} color="white" />
           <Text style={styles.toolbarText}>사진</Text>
@@ -144,7 +148,7 @@ export default function PostWriteForm() {
           <FontAwesome name="hashtag" size={24} color="white" />
           <Text style={styles.toolbarText}>태그</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     </KeyboardAvoidingView>
   );
 }
@@ -153,6 +157,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#121212",
+    // marginBottom: 320,
   },
   statusBar: {
     flexDirection: "row",
@@ -203,7 +208,6 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#333",
   },
-  titleContainer: {},
   titleInput: {
     color: "white",
     fontSize: 18,
@@ -226,7 +230,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderTopWidth: 1,
     borderTopColor: "#333",
-    paddingBottom: 25,
+    paddingBottom: 30,
   },
   toolbarButton: {
     alignItems: "center",
